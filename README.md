@@ -39,6 +39,24 @@ Toggles admins and moderators between player mode and a temporary staff mode wit
 ### Dependencies (optional)
 AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar, RealPVE
 
+### Loadout example
+Each mode (`Admin mode`, `Moderator mode`) has its own `Wear items` and `Belt items` list:
+```json
+"Wear items": [
+  { "Short name": "hoodie", "Skin ID": 3066673296, "Amount": 1 },
+  { "Short name": "tactical.gloves", "Skin ID": 0, "Amount": 1 }
+],
+"Belt items": [
+  { "Short name": "rifle.lr300", "Skin ID": 2024164450, "Amount": 1 }
+]
+```
+Reload the plugin afterwards with `oxide.reload AdminChange`.
+
+### RealPVE loot access out of sync
+`adminpve loot <id>` is a toggle in RealPVE, so its state can get reversed (access granted in player mode, revoked in staff mode).
+- **Single player:** run `/radmin_loot_sync <steamID|_self>` once while that player is in player mode.
+- **Several players:** let all staff members leave staff mode first, then run `adminpve loot clear` in the server console. Anyone still in staff mode during the clear needs `/radmin_loot_sync <steamID>` afterwards.
+
 ### Tested on RustRentner
 All ThornFox plugins are tested extensively on [rustrentner.de](https://rustrentner.de).
 
@@ -83,6 +101,24 @@ Schaltet Admins und Moderatoren zwischen Spielermodus und einem zeitlich begrenz
 
 ### Abhängigkeiten (optional)
 AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar, RealPVE
+
+### Loadout-Beispiel
+Jeder Modus (`Admin mode`, `Moderator mode`) hat eigene Listen `Wear items` und `Belt items`:
+```json
+"Wear items": [
+  { "Short name": "hoodie", "Skin ID": 3066673296, "Amount": 1 },
+  { "Short name": "tactical.gloves", "Skin ID": 0, "Amount": 1 }
+],
+"Belt items": [
+  { "Short name": "rifle.lr300", "Skin ID": 2024164450, "Amount": 1 }
+]
+```
+Danach das Plugin mit `oxide.reload AdminChange` neu laden.
+
+### RealPVE-Plünderrechte verdreht
+`adminpve loot <id>` ist in RealPVE ein Umschalter, deshalb kann der Stand verdreht sein (im Spielermodus erteilt, im Teammodus entzogen).
+- **Einzelner Spieler:** `/radmin_loot_sync <steamID|_self>` einmal ausführen, während der Spieler im Spielermodus ist.
+- **Mehrere Spieler:** Alle Teammitglieder beenden zuerst ihren Teammodus, dann in der Server-Konsole `adminpve loot clear` ausführen. Wer beim Clear noch im Teammodus war, braucht danach einmal `/radmin_loot_sync <steamID>`.
 
 ### Getestet auf RustRentner
 Alle Plugins von ThornFox werden ausgiebig auf [rustrentner.de](https://rustrentner.de) getestet.
