@@ -52,6 +52,19 @@ Each mode (`Admin mode`, `Moderator mode`) has its own `Wear items` and `Belt it
 ```
 Reload the plugin afterwards with `oxide.reload AdminChange`.
 
+### Running without RealPVE
+RealPVE is optional. If you do not use it, disable the integration in `oxide/config/AdminChange.json`:
+```json
+"RealPVE integration": {
+  "Enabled": false,
+  "Plugin name": "RealPVE",
+  "Server command that toggles unrestricted loot access ({0} = Steam ID)": "adminpve loot {0}"
+}
+```
+With `"Enabled": false` no loot command is sent and `/radmin_loot_sync` is inactive. If you use a different PvE plugin, you can instead set `Plugin name` and the toggle command to match that plugin.
+
+The follow-up chat command (default `/radmin_menu`) can be turned off the same way by setting `"Chat command executed for the player after (de)activation (empty = disabled)": ""`.
+
 ### RealPVE loot access out of sync
 `adminpve loot <id>` is a toggle in RealPVE, so its state can get reversed (access granted in player mode, revoked in staff mode).
 - **Single player:** run `/radmin_loot_sync <steamID|_self>` once while that player is in player mode.
@@ -114,6 +127,19 @@ Jeder Modus (`Admin mode`, `Moderator mode`) hat eigene Listen `Wear items` und 
 ]
 ```
 Danach das Plugin mit `oxide.reload AdminChange` neu laden.
+
+### Betrieb ohne RealPVE
+RealPVE ist optional. Wer es nicht nutzt, schaltet die Anbindung in `oxide/config/AdminChange.json` ab:
+```json
+"RealPVE integration": {
+  "Enabled": false,
+  "Plugin name": "RealPVE",
+  "Server command that toggles unrestricted loot access ({0} = Steam ID)": "adminpve loot {0}"
+}
+```
+Mit `"Enabled": false` wird kein Loot-Befehl gesendet und `/radmin_loot_sync` ist ohne Funktion. Wer ein anderes PvE-Plugin nutzt, kann stattdessen `Plugin name` und den Umschalt-Befehl passend zu diesem Plugin eintragen.
+
+Der Folgebefehl im Chat (Standard `/radmin_menu`) lässt sich genauso abschalten: `"Chat command executed for the player after (de)activation (empty = disabled)": ""`.
 
 ### RealPVE-Plünderrechte verdreht
 `adminpve loot <id>` ist in RealPVE ein Umschalter, deshalb kann der Stand verdreht sein (im Spielermodus erteilt, im Teammodus entzogen).
