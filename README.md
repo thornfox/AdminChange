@@ -38,6 +38,12 @@ Toggles admins and moderators between player mode and a temporary staff mode wit
 ### Dependencies (optional)
 AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar, RealPVE
 
+### Tested on RustRentner
+All ThornFox plugins are tested extensively on [rustrentner.de](https://rustrentner.de).
+
+### License
+MIT – see [LICENSE](LICENSE).
+
 ---
 
 ## Deutsch
@@ -75,3 +81,9 @@ Schaltet Admins und Moderatoren zwischen Spielermodus und einem zeitlich begrenz
 
 ### Abhängigkeiten (optional)
 AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar, RealPVE
+
+### Getestet auf RustRentner
+Alle Plugins von ThornFox werden ausgiebig auf [rustrentner.de](https://rustrentner.de) getestet.
+
+### Lizenz
+MIT – siehe [LICENSE](LICENSE).

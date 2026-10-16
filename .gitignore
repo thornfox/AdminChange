@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+*.dll
+*.pdb
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local server files (never commit configs, data or logs from a live server)
+oxide/
+carbon/
+*.log
