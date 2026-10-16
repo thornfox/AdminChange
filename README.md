@@ -89,6 +89,11 @@ The follow-up chat command (default `/radmin_menu`) can be turned off the same w
 - **Single player:** run `/radmin_loot_sync <steamID|_self>` once while that player is in player mode.
 - **Several players:** let all staff members leave staff mode first, then run `adminpve loot clear` in the server console. Anyone still in staff mode during the clear needs `/radmin_loot_sync <steamID>` afterwards.
 
+### Works with CommandMenu
+AdminChange and [CommandMenu](https://github.com/thornfox/CommandMenu) are designed to work together. By default, AdminChange runs `/radmin_menu` after staff mode is activated or deactivated, which toggles the admin button menu of CommandMenu. Staff members get their admin commands as buttons right away.
+- Install `CommandMenu.cs` and grant `commandmenu.admin` to your admin/moderator group.
+- CommandMenu is optional. Without it, set `"Chat command executed for the player after (de)activation (empty = disabled)": ""`.
+
 ### Tested on RustRentner
 All ThornFox plugins are tested extensively on [rustrentner.de](https://rustrentner.de).
 
@@ -183,6 +188,11 @@ Der Folgebefehl im Chat (Standard `/radmin_menu`) lässt sich genauso abschalten
 `adminpve loot <id>` ist in RealPVE ein Umschalter, deshalb kann der Stand verdreht sein (im Spielermodus erteilt, im Teammodus entzogen).
 - **Einzelner Spieler:** `/radmin_loot_sync <steamID|_self>` einmal ausführen, während der Spieler im Spielermodus ist.
 - **Mehrere Spieler:** Alle Teammitglieder beenden zuerst ihren Teammodus, dann in der Server-Konsole `adminpve loot clear` ausführen. Wer beim Clear noch im Teammodus war, braucht danach einmal `/radmin_loot_sync <steamID>`.
+
+### Zusammenspiel mit CommandMenu
+AdminChange und [CommandMenu](https://github.com/thornfox/CommandMenu) sind aufeinander abgestimmt. AdminChange führt nach dem Aktivieren oder Beenden des Teammodus standardmäßig `/radmin_menu` aus und blendet damit das Admin-Button-Menü von CommandMenu ein bzw. aus. Teammitglieder haben ihre Admin-Befehle so sofort als Buttons zur Hand.
+- `CommandMenu.cs` installieren und der Admin-/Moderator-Gruppe `commandmenu.admin` geben.
+- CommandMenu ist optional. Ohne das Plugin `"Chat command executed for the player after (de)activation (empty = disabled)": ""` setzen.
 
 ### Getestet auf RustRentner
 Alle Plugins von ThornFox werden ausgiebig auf [rustrentner.de](https://rustrentner.de) getestet.
