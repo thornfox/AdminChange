@@ -39,11 +39,14 @@ using UnityEngine;
  *        - New admin command /radmin_loot_sync [steamID|_self] flips the RealPVE loot access once
  *          to re-align it when it is out of sync (granted in player mode, revoked in staff mode).
  *        - Every loot toggle is logged to the server console.
+ * 1.1.2  Every optional dependency can be switched off in the configuration
+ *        (section "Optional plugin integrations"): AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar.
+ *        RealPVE keeps its own section. All are optional; a missing plugin is simply skipped.
  */
 
 namespace Oxide.Plugins
 {
-    [Info("AdminChange", "ThornFox", "1.1.1")]
+    [Info("AdminChange", "ThornFox", "1.1.2")]
     [Description("Toggles admins and moderators between player mode and a temporary staff mode with its own loadout, safe inventory storage and automatic deactivation.")]
     public class AdminChange : RustPlugin
     {
@@ -100,6 +103,9 @@ namespace Oxide.Plugins
             [JsonProperty("Moderator mode")]
             public ModeSettings Mod;
 
+            [JsonProperty("Optional plugin integrations (true = use if installed, false = never use)")]
+            public IntegrationSettings Integrations;
+
             [JsonProperty("RealPVE integration")]
             public RealPveSettings RealPve;
 
@@ -123,10 +129,29 @@ namespace Oxide.Plugins
                 if (Mod == null) Mod = ModeSettings.DefaultMod();
                 Admin.Normalize("ADMIN MODE ACTIVE", "#FF0000");
                 Mod.Normalize("MODERATOR MODE ACTIVE", "#800080");
+                if (Integrations == null) Integrations = new IntegrationSettings();
                 if (RealPve == null) RealPve = new RealPveSettings();
                 if (AutoDeactivationMinutes < 0) AutoDeactivationMinutes = 0;
                 if (FollowUpChatCommand == null) FollowUpChatCommand = string.Empty;
             }
+        }
+
+        private class IntegrationSettings
+        {
+            [JsonProperty("AdvancedStatus (status bar with countdown)")]
+            public bool AdvancedStatus = true;
+
+            [JsonProperty("Backpacks (store and return the backpack contents)")]
+            public bool Backpacks = true;
+
+            [JsonProperty("Godmode (god mode while staff mode is active)")]
+            public bool Godmode = true;
+
+            [JsonProperty("Vanish (invisible in admin mode)")]
+            public bool Vanish = true;
+
+            [JsonProperty("AdminRadar (turn the radar off on deactivation)")]
+            public bool AdminRadar = true;
         }
 
         private class GroupSettings
@@ -839,8 +864,8 @@ namespace Oxide.Plugins
             permission.AddUserGroup(player.UserIDString, ActiveGroup(mode));
             SaveData();
 
-            Godmode?.Call("EnableGodmode", player.UserIDString);
-            if (mode == ModeAdmin) Vanish?.Call("Disappear", player);
+            if (UseGodmode) Godmode.Call("EnableGodmode", player.UserIDString);
+            if (mode == ModeAdmin && UseVanish) Vanish.Call("Disappear", player);
 
             Reply(player, mode == ModeAdmin ? "AdminActivated" : "ModActivated");
             Puts($"Staff mode '{mode}' activated: {player.displayName} ({id})");
@@ -871,7 +896,7 @@ namespace Oxide.Plugins
             StopDeactivationTimer(id);
             string mode = ResolveMode(info, player.UserIDString);
 
-            var radarResult = AdminRadar?.Call("IsRadar", player.UserIDString);
+            var radarResult = UseAdminRadar ? AdminRadar.Call("IsRadar", player.UserIDString) : null;
             bool radarActive = radarResult is bool && (bool)radarResult;
 
             PauseBackpackGather(id);
@@ -901,10 +926,10 @@ namespace Oxide.Plugins
             permission.RemoveUserGroup(player.UserIDString, _config.Groups.ModActive);
             HideBars(id);
 
-            Godmode?.Call("DisableGodmode", player.UserIDString);
-            if (mode == ModeAdmin) Vanish?.Call("Reappear", player);
+            if (UseGodmode) Godmode.Call("DisableGodmode", player.UserIDString);
+            if (mode == ModeAdmin && UseVanish) Vanish.Call("Reappear", player);
             player.SendConsoleCommand("admintime -1");
-            if (radarActive) AdminRadar?.Call("RadarCommand", player.IPlayer);
+            if (radarActive && UseAdminRadar) AdminRadar.Call("RadarCommand", player.IPlayer);
 
             SetRealPveLoot(player, info, false);
 
@@ -976,9 +1001,17 @@ namespace Oxide.Plugins
 
         #region Integrations
 
+        private static bool IsUsable(Plugin plugin, bool enabled) => enabled && plugin != null && plugin.IsLoaded;
+
+        private bool UseAdvancedStatus => IsUsable(AdvancedStatus, _config.Integrations.AdvancedStatus);
+        private bool UseBackpacks => IsUsable(Backpacks, _config.Integrations.Backpacks);
+        private bool UseGodmode => IsUsable(Godmode, _config.Integrations.Godmode);
+        private bool UseVanish => IsUsable(Vanish, _config.Integrations.Vanish);
+        private bool UseAdminRadar => IsUsable(AdminRadar, _config.Integrations.AdminRadar);
+
         private bool IsAdvancedStatusReady()
         {
-            if (AdvancedStatus == null || !AdvancedStatus.IsLoaded) return false;
+            if (!UseAdvancedStatus) return false;
             var result = AdvancedStatus.Call("IsReady");
             return result is bool && (bool)result;
         }
@@ -1016,7 +1049,7 @@ namespace Oxide.Plugins
 
         private void HideBars(ulong id)
         {
-            if (AdvancedStatus == null || !AdvancedStatus.IsLoaded) return;
+            if (!UseAdvancedStatus) return;
             AdvancedStatus.Call("DeleteBar", id, BarIdAdmin, Name);
             AdvancedStatus.Call("DeleteBar", id, BarIdMod, Name);
         }
@@ -1024,13 +1057,13 @@ namespace Oxide.Plugins
         private ItemContainer GetBackpackContainer(ulong id)
         {
             // Deprecated in Backpacks, but still the only container API. Covers the first backpack page only.
-            if (Backpacks == null || !Backpacks.IsLoaded) return null;
+            if (!UseBackpacks) return null;
             return Backpacks.Call("API_GetBackpackContainer", id) as ItemContainer;
         }
 
         private void PauseBackpackGather(ulong id)
         {
-            if (Backpacks == null || !Backpacks.IsLoaded) return;
+            if (!UseBackpacks) return;
             Backpacks.Call("API_PauseBackpackGatherMode", id, 0f);
         }
 

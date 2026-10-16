@@ -1,6 +1,6 @@
 # AdminChange
 
-**Author:** ThornFox · **Version:** 1.1.1 · **Framework:** Oxide (uMod) for Rust
+**Author:** ThornFox · **Version:** 1.1.2 · **Framework:** Oxide (uMod) for Rust
 
 ## English
 
@@ -36,8 +36,27 @@ Toggles admins and moderators between player mode and a temporary staff mode wit
 - `adminchange.admin` – admin access (alternative: configured admin group)
 - `adminchange.mod` – moderator access (alternative: configured moderator group)
 
-### Dependencies (optional)
-AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar, RealPVE
+### Dependencies (all optional)
+AdminChange runs without any other plugin. Every integration is used only if the plugin is installed **and** enabled in the config, and each one can be switched off.
+
+| Plugin | What it adds | Config switch |
+|---|---|---|
+| AdvancedStatus | Status bar with countdown | `Optional plugin integrations` → `AdvancedStatus` |
+| Backpacks | Backpack contents are stored and returned | `Optional plugin integrations` → `Backpacks` |
+| Godmode | God mode while staff mode is active | `Optional plugin integrations` → `Godmode` |
+| Vanish | Invisible in admin mode | `Optional plugin integrations` → `Vanish` |
+| AdminRadar | Radar is turned off on deactivation | `Optional plugin integrations` → `AdminRadar` |
+| RealPVE | Unrestricted loot access in staff mode | `RealPVE integration` → `Enabled` |
+
+```json
+"Optional plugin integrations (true = use if installed, false = never use)": {
+  "AdvancedStatus (status bar with countdown)": true,
+  "Backpacks (store and return the backpack contents)": true,
+  "Godmode (god mode while staff mode is active)": true,
+  "Vanish (invisible in admin mode)": true,
+  "AdminRadar (turn the radar off on deactivation)": true
+}
+```
 
 ### Loadout example
 Each mode (`Admin mode`, `Moderator mode`) has its own `Wear items` and `Belt items` list:
@@ -112,8 +131,27 @@ Schaltet Admins und Moderatoren zwischen Spielermodus und einem zeitlich begrenz
 - `adminchange.admin` – Admin-Zugriff (alternativ: konfigurierte Admin-Gruppe)
 - `adminchange.mod` – Moderator-Zugriff (alternativ: konfigurierte Moderator-Gruppe)
 
-### Abhängigkeiten (optional)
-AdvancedStatus, Backpacks, Godmode, Vanish, AdminRadar, RealPVE
+### Abhängigkeiten (alle optional)
+AdminChange läuft ohne jedes andere Plugin. Jede Anbindung wird nur genutzt, wenn das Plugin installiert **und** in der Config aktiviert ist, und jede lässt sich abschalten.
+
+| Plugin | Was es ergänzt | Schalter in der Config |
+|---|---|---|
+| AdvancedStatus | Statusbalken mit Countdown | `Optional plugin integrations` → `AdvancedStatus` |
+| Backpacks | Rucksackinhalt wird gesichert und zurückgegeben | `Optional plugin integrations` → `Backpacks` |
+| Godmode | Unverwundbar im Teammodus | `Optional plugin integrations` → `Godmode` |
+| Vanish | Unsichtbar im Admin-Modus | `Optional plugin integrations` → `Vanish` |
+| AdminRadar | Radar wird beim Beenden ausgeschaltet | `Optional plugin integrations` → `AdminRadar` |
+| RealPVE | Freier Loot-Zugriff im Teammodus | `RealPVE integration` → `Enabled` |
+
+```json
+"Optional plugin integrations (true = use if installed, false = never use)": {
+  "AdvancedStatus (status bar with countdown)": true,
+  "Backpacks (store and return the backpack contents)": true,
+  "Godmode (god mode while staff mode is active)": true,
+  "Vanish (invisible in admin mode)": true,
+  "AdminRadar (turn the radar off on deactivation)": true
+}
+```
 
 ### Loadout-Beispiel
 Jeder Modus (`Admin mode`, `Moderator mode`) hat eigene Listen `Wear items` und `Belt items`:
