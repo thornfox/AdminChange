@@ -1,6 +1,6 @@
 # AdminChange
 
-**Author:** ThornFox · **Version:** 1.1.0 · **Framework:** Oxide (uMod) for Rust
+**Author:** ThornFox · **Version:** 1.1.1 · **Framework:** Oxide (uMod) for Rust
 
 ## English
 
@@ -30,6 +30,7 @@ Toggles admins and moderators between player mode and a temporary staff mode wit
 | `/radmin_ei` | Admin | Show info about the entity you are looking at |
 | `/radmin_hand` | Admin | Show info about the item in your hand |
 | `/aclear` | Admin | Reset main inventory capacity to 24 |
+| `/radmin_loot_sync [steamID\|_self]` | Admin | Flip RealPVE loot access once if it is out of sync |
 
 ### Permissions
 - `adminchange.admin` – admin access (alternative: configured admin group)
@@ -74,6 +75,7 @@ Schaltet Admins und Moderatoren zwischen Spielermodus und einem zeitlich begrenz
 | `/radmin_ei` | Admin | Infos zum angesehenen Entity |
 | `/radmin_hand` | Admin | Infos zum Item in der Hand |
 | `/aclear` | Admin | Inventarkapazität auf 24 zurücksetzen |
+| `/radmin_loot_sync [steamID\|_self]` | Admin | RealPVE-Plünderrechte einmal umschalten, falls sie verdreht sind |
 
 ### Berechtigungen
 - `adminchange.admin` – Admin-Zugriff (alternativ: konfigurierte Admin-Gruppe)

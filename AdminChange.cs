@@ -35,11 +35,15 @@ using UnityEngine;
  *        - Permissions adminchange.admin / adminchange.mod (groups still supported).
  *        - /aclear requires admin access; chests cannot be assigned twice or changed while active.
  *        - Skin IDs as ulong; all chat texts via lang (en + de).
+ * 1.1.1  RealPVE loot access:
+ *        - New admin command /radmin_loot_sync [steamID|_self] flips the RealPVE loot access once
+ *          to re-align it when it is out of sync (granted in player mode, revoked in staff mode).
+ *        - Every loot toggle is logged to the server console.
  */
 
 namespace Oxide.Plugins
 {
-    [Info("AdminChange", "ThornFox", "1.1.0")]
+    [Info("AdminChange", "ThornFox", "1.1.1")]
     [Description("Toggles admins and moderators between player mode and a temporary staff mode with its own loadout, safe inventory storage and automatic deactivation.")]
     public class AdminChange : RustPlugin
     {
@@ -586,7 +590,11 @@ namespace Oxide.Plugins
                 ["BackpackUnavailable"] = "Backpack API not available or no backpack found.",
                 ["NotLookingAtEntity"] = "You are not looking at an entity.",
                 ["HandItemInfo"] = "Short name: {0}\nItem ID: {1}\nSkin: {2}\nCategory: {3}\nCondition: {4}\nAmount: {5}",
-                ["NoItemInHand"] = "You are not holding an item."
+                ["NoItemInHand"] = "You are not holding an item.",
+                ["LootSyncUnavailable"] = "{0} is not loaded or the integration is disabled.",
+                ["LootSyncDone"] = "RealPVE loot access for {0} was flipped once. It should now be {1}. Check the server console for the RealPVE reply.",
+                ["LootExpectedOn"] = "GRANTED (staff mode active)",
+                ["LootExpectedOff"] = "REVOKED (player mode)"
             }, this, "en");
 
             lang.RegisterMessages(new Dictionary<string, string>
@@ -646,7 +654,11 @@ namespace Oxide.Plugins
                 ["BackpackUnavailable"] = "Rucksack-API nicht verfügbar oder kein Rucksack gefunden.",
                 ["NotLookingAtEntity"] = "Du schaust kein Entity an.",
                 ["HandItemInfo"] = "Shortname: {0}\nItem-ID: {1}\nSkin: {2}\nKategorie: {3}\nZustand: {4}\nAnzahl: {5}",
-                ["NoItemInHand"] = "Du hältst kein Item in der Hand."
+                ["NoItemInHand"] = "Du hältst kein Item in der Hand.",
+                ["LootSyncUnavailable"] = "{0} ist nicht geladen oder die Anbindung ist deaktiviert.",
+                ["LootSyncDone"] = "Die RealPVE-Plünderrechte für {0} wurden einmal umgeschaltet. Sie sollten jetzt {1} sein. Die Antwort von RealPVE steht in der Server-Konsole.",
+                ["LootExpectedOn"] = "ERTEILT (Teammodus aktiv)",
+                ["LootExpectedOff"] = "ENTZOGEN (Spielermodus)"
             }, this, "de");
         }
 
@@ -1034,15 +1046,30 @@ namespace Oxide.Plugins
                 return;
             }
 
+            if (!RunRealPveLootToggle(player.UserIDString)) return;
+
+            info.LootToggled = enable;
+            SaveData();
+            Puts($"RealPVE loot access {(enable ? "granted to" : "revoked from")} {player.displayName} ({player.UserIDString}).");
+        }
+
+        private bool IsRealPveLoaded()
+        {
+            var realPve = plugins.Find(_config.RealPve.PluginName);
+            return realPve != null && realPve.IsLoaded;
+        }
+
+        private bool RunRealPveLootToggle(string userId)
+        {
             try
             {
-                rust.RunServerCommand(string.Format(_config.RealPve.LootToggleCommand, player.UserIDString));
-                info.LootToggled = enable;
-                SaveData();
+                rust.RunServerCommand(string.Format(_config.RealPve.LootToggleCommand, userId));
+                return true;
             }
             catch (FormatException)
             {
                 PrintError("Invalid 'Server command that toggles unrestricted loot access' in the configuration.");
+                return false;
             }
         }
 
@@ -1616,6 +1643,33 @@ namespace Oxide.Plugins
 
             if (dropped.Count > 0) Reply(player, "ItemsDropped", string.Join(", ", dropped));
             Reply(player, "RestoreDone");
+        }
+
+        [ChatCommand("radmin_loot_sync")]
+        private void CmdLootSync(BasePlayer player, string command, string[] args)
+        {
+            if (!IsAdminUser(player)) { Reply(player, "NoPermission"); return; }
+
+            ulong targetId = player.userID.Get();
+            if (args.Length > 0 && !TryParseTarget(player, args[0], out targetId))
+            {
+                Reply(player, "InvalidSteamId");
+                return;
+            }
+
+            if (!_config.RealPve.Enabled || !IsRealPveLoaded())
+            {
+                Reply(player, "LootSyncUnavailable", _config.RealPve.PluginName);
+                return;
+            }
+
+            // Flips the real RealPVE state once without changing what this plugin tracks.
+            if (!RunRealPveLootToggle(targetId.ToString())) return;
+
+            PlayerInfo info;
+            bool active = _data.Players.TryGetValue(targetId, out info) && info.Active;
+            Puts($"RealPVE loot access flipped manually for {targetId} by {player.displayName} (staff mode {(active ? "active" : "inactive")}).");
+            Reply(player, "LootSyncDone", targetId, Msg(active ? "LootExpectedOn" : "LootExpectedOff", player.UserIDString));
         }
 
         [ChatCommand("radmin_ei")]
